@@ -8,9 +8,9 @@ import (
 )
 
 type student struct {
-	ID       string
-	Name     string
-	ClassNum classNum
+	ID       string   `json:"id"`
+	Name     string   `json:"name"`
+	ClassNum classNum `json:"classNum"`
 }
 
 var studentsDB = map[string]student{
@@ -24,9 +24,9 @@ func GetStudentByID(w http.ResponseWriter, r *http.Request) {
 
 	for _, student := range studentsDB {
 		if student.ID == studentID {
-			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(student)
+			responce, _ := json.MarshalIndent(student, "", " ")
+			w.Write(responce)
 			return
 		}
 	}

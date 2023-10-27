@@ -23,7 +23,7 @@ func permission(fn http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if !permisionList[login(cookie.Value)] {
-			http.Error(w, "your session is expired", http.StatusUnauthorized)
+			http.Error(w, "You have no permission", http.StatusUnauthorized)
 		}
 
 		fn.ServeHTTP(w, req)

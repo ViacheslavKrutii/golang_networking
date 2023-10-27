@@ -9,6 +9,11 @@ import (
 	"net/http"
 )
 
+type authenticateForm struct {
+	Login    login    `json:"login"`
+	Password password `json:"password"`
+}
+
 var authenticated map[login]bool = make(map[login]bool)
 
 func authenticate(w http.ResponseWriter, r *http.Request) {
@@ -21,9 +26,9 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var newAttempt attempt
+	var newAuthenticateForm authenticateForm
 
-	err = json.Unmarshal(body, &newAttempt)
+	err = json.Unmarshal(body, &newAuthenticateForm)
 
 	if err != nil {
 		log.Println(err)
@@ -31,14 +36,14 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	originPassword, loginExist := registered[newAttempt.Login]
+	originPassword, loginExist := registered[newAuthenticateForm.Login]
 	if !loginExist {
 		http.Error(w, "login doesn`t exist", http.StatusBadRequest)
 		return
 	}
 
 	h := sha1.New()
-	h.Write([]byte(newAttempt.Password))
+	h.Write([]byte(newAuthenticateForm.Password))
 	guessPassword := password(hex.EncodeToString(h.Sum(nil)))
 
 	if originPassword != guessPassword {
@@ -46,18 +51,39 @@ func authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authenticated[newAttempt.Login] = true
+	authenticated[newAuthenticateForm.Login] = true
 
-	cookie := http.Cookie{
+	cookieAuth := http.Cookie{
 		Name:     "session",
-		Value:    string(newAttempt.Login),
+		Value:    string(newAuthenticateForm.Login),
 		Path:     "/",
 		MaxAge:   3600,
 		HttpOnly: true,
 		Secure:   false,
 		SameSite: http.SameSiteNoneMode,
 	}
-	http.SetCookie(w, &cookie)
+
+	// hash := sha1.New()
+	// hash.Write([]byte("true"))
+	// valueCookiePermission := hex.EncodeToString(hash.Sum(nil))
+
+	// cookiePermission := http.Cookie{
+	// 	Name:     "permission",
+	// 	Value:    valueCookiePermission,
+	// 	Path:     "/",
+	// 	MaxAge:   3600,
+	// 	HttpOnly: true,
+	// 	Secure:   false,
+	// 	SameSite: http.SameSiteNoneMode,
+	// }
+
+	// if permisionList[newAuthenticateForm.Login] {
+	// 	http.SetCookie(w, &cookiePermission)
+	// } else {
+	// 	http.Error(w, "you have no permission", http.StatusBadRequest)
+	// }
+
+	http.SetCookie(w, &cookieAuth)
 
 	w.Write([]byte("you are logged in"))
 }

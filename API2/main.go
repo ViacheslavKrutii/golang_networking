@@ -15,5 +15,7 @@ func main() {
 	r.HandleFunc("/register", register)
 	r.HandleFunc("/login", authenticate)
 
+	r.HandleFunc("/student/{id}", permission(GetStudentByID)).Methods("GET")
+
 	http.ListenAndServe("localhost:8080", r)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 )
@@ -18,8 +19,17 @@ var tasksDB = map[string][]task{
 func tasks(w http.ResponseWriter, r *http.Request) {
 	log.Println("tasks handler")
 
+	// body must be dd.mm.yyyy
+	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	responce, _ := json.MarshalIndent(tasksDB, "", " ")
+	responce, _ := json.MarshalIndent(tasksDB[string(body)], "", " ")
 	w.Write(responce)
 
 }

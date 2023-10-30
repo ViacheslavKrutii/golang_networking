@@ -9,3 +9,7 @@ type teacher struct {
 var teachersDB = map[string]teacher{
 	"1": {ID: "1", Name: "Franc", ClassNum: 5},
 }
+
+func addTeacherDB(t teacher) {
+	teachersDB[t.ID] = t
+}

@@ -14,8 +14,12 @@ type student struct {
 }
 
 var studentsDB = map[string]student{
-	"1": {ID: "1", Name: "John", ClassNum: 5},
-	"2": {ID: "2", Name: "Alice", ClassNum: 5},
+	"1": {ID: "1", Name: "John", ClassNum: 1},
+	"2": {ID: "2", Name: "Alice", ClassNum: 1},
+}
+
+func addStudentDB(s student) {
+	studentsDB[s.ID] = s
 }
 
 func GetStudentByID(w http.ResponseWriter, r *http.Request) {

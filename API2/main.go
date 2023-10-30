@@ -10,7 +10,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", root)
 	r.HandleFunc("/users", authorize(users))
-	r.HandleFunc("/subscriptions", authorize(subscriptions))
 
 	r.HandleFunc("/register", register)
 	r.HandleFunc("/login", authenticate)
